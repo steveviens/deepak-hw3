@@ -1,6 +1,6 @@
 version: 0.0
 resources:
-  - HW2LambdaFunction3:
+  - HW3LambdaFunction:
     type: AWS::Lambda::Function
     properties:
       name: "hw3_lambda"
