@@ -1,0 +1,37 @@
+version: 0.2
+
+env:
+    variables:
+
+phases:
+    install:
+        runtime-versions:
+            python: 3.8
+        commands:
+            - echo "Capturing the AWS CLI and Python versions used in this build."
+            - aws --version
+            - python --version
+    pre_build:
+        commands:
+    build:
+        commands:
+            - echo Build started on `date`
+            - zip -r -j hw3_1323_lambda1.zip src/hw3_lambda1.py src/util.py
+            - zip -r -j hw3_1323_lambda2.zip src/hw3_lambda2.py src/util.py
+            - zip -r -j hw3_1323_validate_lambdas.zip src/hw3_validate_before_lambda.py src/hw3_validate_after_lambda.py src/util.py
+    post_build:
+        commands:
+            - echo Build completed on `date`
+            - echo "Updating lambda function code."
+            - aws lambda update-function-code --function-name "hw3_lambda1" --zip-file fileb://./hw3_1323_lambda1.zip
+            - aws lambda update-function-code --function-name "hw3_lambda2" --zip-file fileb://./hw3_1323_lambda2.zip
+            - aws lambda update-function-code --function-name "hw3_validate_before_lambda" --zip-file fileb://./hw3_1323_validate_lambdas.zip
+            - aws lambda update-function-code --function-name "hw3_validate_after_lambda" --zip-file fileb://./hw3_1323_validate_lambdas.zip
+            #- aws lambda publish-version --function-name "hw3_lambda3"
+
+artifacts:
+    name: hw3_1323_lambda_build
+    files:
+        - 'hw3_1323_lambdas.zip'
+        - './appspec.yml'
+    discard-paths: yes
