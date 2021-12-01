@@ -12,11 +12,6 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt HW3LambdaFunction.Arn
-            Filter:
-              S3Key:
-                Rules:
-                - Name: suffix
-                  Value: .jpeg
 
 
   HW3EmailBucketPolicy:
