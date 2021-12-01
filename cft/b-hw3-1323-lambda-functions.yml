@@ -1,0 +1,124 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates lambda functions used for Homework #2"
+Resources:
+
+  HW2PhotosBucket:
+    # Source: https://www.itonaut.com/2018/10/03/implement-s3-bucket-lambda-triggers-in-aws-cloudformation/
+    Type: AWS::S3::Bucket
+    DependsOn: HW2TriggerLambdaFunction1Permission
+    Properties:
+      BucketName: 'hw2-1323-photos'
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt HW2LambdaFunction1.Arn
+            Filter:
+              S3Key:
+                Rules:
+                - Name: suffix
+                  Value: .jpeg
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2TriggerLambdaFunction1Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt HW2LambdaFunction1.Arn
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub 'arn:aws:s3:::hw2-1323-photos'
+      SourceAccount: !Ref AWS::AccountId
+
+  HW2LambdaFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hw2-1323-lambda-function-execution-role
+      Description: Describe this IAM role here
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: hw2-1323-admin-access-policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: "*"
+            Resource: "*"
+
+  HW2LambdaFunction1:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Uses AWS Rekognition to scan photos uploaded to S3 bucket
+      FunctionName: hw2_lambda1
+      Runtime: python3.8
+      Role: !GetAtt HW2LambdaFunctionExecutionRole.Arn
+      Code:
+        S3Bucket: hw2-1323-repo
+        S3Key: hw2_1323_lambda_build/hw2_1323_lambdas.zip
+      Handler: hw2_lambda1.lambda_handler
+      MemorySize: 256
+      Timeout: 10
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2LambdaFunction2:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Search for photos in Open Search domain
+      FunctionName: hw2_lambda2
+      Runtime: python3.8
+      Role: !GetAtt HW2LambdaFunctionExecutionRole.Arn
+      Code:
+        S3Bucket: hw2-1323-repo
+        S3Key: hw2_1323_lambda_build/hw2_1323_lambdas.zip
+      Handler: hw2_lambda2.lambda_handler
+      MemorySize: 256
+      Timeout: 10
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2LambdaFunction3:
+    # Source: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-lambda-function.html
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Describe hw2_lambda3 here
+      FunctionName: hw2_lambda3
+      Runtime: python3.8
+      Role: !GetAtt HW2LambdaFunctionExecutionRole.Arn
+      Code:
+        S3Bucket: hw2-1323-repo
+        S3Key: hw2_1323_lambda_build/hw2_1323_lambdas.zip
+      Handler: hw2_lambda3.lambda_handler
+      MemorySize: 256
+      Timeout: 10
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+Outputs:
+  HW2PhotosBucketARN:
+    Description: 'The ARN for the hw2-1323-photos bucket'
+    Value: !GetAtt HW2PhotosBucket.Arn
+  HW2LambdaFunctionExecutionRoleARN:
+    Description: 'The ARN for the lambda function execution role'
+    Value: !GetAtt HW2LambdaFunctionExecutionRole.Arn
+

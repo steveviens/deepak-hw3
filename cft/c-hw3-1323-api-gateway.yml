@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Creates API Gateway for Homework #2'
+Resources:
+
+  HW2RestAPI:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: hw2-1323-api-gateway
+      Description: An api gateway with S3 service integrations
+      ApiKeySourceType: HEADER
+      BinaryMediaTypes:
+        - '*/*'
+      EndpointConfiguration:
+        Types:
+        - REGIONAL
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2RestAPISearchResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt HW2RestAPI.RootResourceId
+      PathPart: 'search'
+      RestApiId: !Ref HW2RestAPI
+
+  HW2RestAPISearchGETMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: GET
+      ResourceId: !Ref HW2RestAPISearchResource
+      RestApiId: !Ref HW2RestAPI
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Uri: !Sub
+          - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+          - lambdaArn: !Join
+              - ''
+              - - 'arn:aws:lambda:'
+                - !Ref AWS::Region
+                - ':'
+                - !Ref AWS::AccountId
+                - ':function:hw2_lambda2'
+        Credentials: !GetAtt HW2RestAPIIamRole.Arn
+        IntegrationResponses:
+          - SelectionPattern: ''
+            StatusCode: 200
+      MethodResponses:
+        - StatusCode: 200
+
+
+  HW2RestAPIPhotosResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt HW2RestAPI.RootResourceId
+      PathPart: 'photos'
+      RestApiId: !Ref HW2RestAPI
+
+  HW2RestAPIFolderResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref HW2RestAPIPhotosResource
+      PathPart: '{folder}'
+      RestApiId: !Ref HW2RestAPI
+
+  HW2RestAPIObjectResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref HW2RestAPIFolderResource
+      PathPart: '{object}'
+      RestApiId: !Ref HW2RestAPI
+
+  HW2RestAPIPhotosPUTMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      HttpMethod: PUT
+      ResourceId: !Ref HW2RestAPIObjectResource
+      RestApiId: !Ref HW2RestAPI
+      RequestParameters:
+        method.request.path.folder: true
+        method.request.path.object: true
+      Integration:
+        IntegrationHttpMethod: PUT
+        Type: AWS
+        RequestParameters:
+          integration.request.path.bucket: method.request.path.folder
+          integration.request.path.key: method.request.path.object
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:s3:path/{bucket}/{key}'
+        ConnectionType: INTERNET
+        Credentials: !GetAtt HW2RestAPIIamRole.Arn
+        PassthroughBehavior: WHEN_NO_MATCH
+        TimeoutInMillis: 29000
+        IntegrationResponses:
+          - SelectionPattern: ''
+            StatusCode: 200
+            ContentHandling: CONVERT_TO_TEXT
+          - SelectionPattern: 400
+            StatusCode: 400
+            ContentHandling: CONVERT_TO_TEXT
+          - SelectionPattern: 500
+            StatusCode: 500
+            ContentHandling: CONVERT_TO_TEXT
+      MethodResponses:
+        - StatusCode: 200
+        - StatusCode: 400
+        - StatusCode: 500
+
+
+  HW2RestAPIStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      StageName: v1
+      Description: HW2 API Stage v0
+      DeploymentId: !Ref HW2RestAPIDeployment
+      RestApiId: !Ref HW2RestAPI
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          LoggingLevel: INFO   # VALID VALUES ARE OFF, ERROR and INFO
+          DataTraceEnabled: true
+          MetricsEnabled: false
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2RestAPIDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: HW2RestAPIPhotosPUTMethod
+    Properties:
+      Description: HW2 API Deployment
+      RestApiId: !Ref HW2RestAPI
+
+  HW2RestAPIIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hw2-1323-api-gateway-role
+      Description: Allows API Gateway to push logs to CloudWatch Logs and put binary objects to an S3 bucket.
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ''
+            Effect: 'Allow'
+            Principal:
+              Service:
+                - 'apigateway.amazonaws.com'
+            Action:
+              - 'sts:AssumeRole'
+      Path: '/'
+      ManagedPolicyArns:
+          - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+          #- arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: hw2-1323-api-gateway-s3-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Action: s3:PutObject
+              Resource: arn:aws:s3:::hw2-1323-photos/*
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  HW2RestAPIIamPolicy:
+    Type: 'AWS::IAM::Policy'
+    DependsOn: HW2RestAPIIamRole
+    Properties:
+      PolicyName: hw2-1323-api-gateway_lambda_policy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Action: 'lambda:InvokeFunction'
+            Resource: '*'
+      Roles:
+        - Ref: HW2RestAPIIamRole

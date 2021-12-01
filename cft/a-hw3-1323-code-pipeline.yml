@@ -1,0 +1,196 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Creates Homework #2 Code Pipeline'
+Resources:
+
+
+  HW2RepoBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: 'hw2-1323-repo'
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+
+  # SOURCE: https://gist.github.com/andreidiaconu90/178a74c4bba55406bd6f60106a8ad0d3
+
+  HW2CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: 'hw2-1323-codedeploy'
+      ArtifactStore:
+        - Type: S3
+        - Location: !Ref: HW2RepoBucket
+      RoleArn: !GetAtt
+        - HW2CodePipelineServiceRole
+        - Arn
+      Tags:
+        - Key: project
+          Value: hw2
+        - Key: account
+          Value: 1323
+      #RestartExecutionOnUpdate: true
+      Stages:
+        - Name: Source # this is the name that will show up in the AWS console, so consider this the user-friendly name
+          Actions:
+            - Name: Get-Source # this is the name used to reference a step by. Consider this the developer-friendly name
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeCommit #we're using CodeCommit, but you can also use other supported repo providers
+                Version: "1"
+              OutputArtifacts:
+                - Name: code-artifact #the name of the zip file containing our source code. This will be used as InputArtifact by the following stages
+              Configuration:
+                BranchName: master
+                RepositoryName: my-repository-name
+                PollForSourceChanges: false
+              RunOrder: 1
+        - Name: Staging
+          Actions:
+            - Name: Deploy-to-Staging
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              RunOrder: 1
+              Configuration:
+                ProjectName: "Deploy-to-staging" # reference to the CodeBuild project with this name. Must mach the name of an existing CodeBuild project
+              InputArtifacts:
+                - Name: code-artifact # reference to the source code artifact with the same name. Must mach the Output artifact name in the Source stage.
+        - Name: Promote
+          Actions:
+            - Name: Promote-staging-to-production #Built-in step that adds a manual approval step
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: "1"
+        - Name: Production
+          Actions:
+            - Name: Deploy-to-Production
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              RunOrder: 1
+              Configuration:
+                ProjectName: "Deploy-to-production" #reference to the CodeBuild project with this name. Must mach the name of an existing CodeBuild project
+              InputArtifacts:
+                - Name: code-artifact
+
+  HW2CodeBuildDeploy2Stage:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: 'hw2-1323-code-build-deploy2stage'
+      ServiceRole: !GetAtt
+        - HW2CodePipelineServiceRole
+        - Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        EnvironmentVariables:
+          - Name: environment
+            Value: staging
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: 'buildspec.yml'
+      TimeoutInMinutes: 10
+
+
+  HW2CodeBuildDeploy2Prod:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: 'hw2-1323-code-build-deploy2prod'
+      ServiceRole: !GetAtt
+        - MyCodePipelineServiceRole
+        - Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        EnvironmentVariables:
+          - Name: environment
+            Value: prod
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: 'buildspec.yml'
+      TimeoutInMinutes: 10
+
+
+  HW2CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hw2-1323-code-pipeline-service-role
+      Description: Allows CodePipeline to do it's thing.
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+                - codebuild.amazonaws.com
+            Action: "sts:AssumeRole"
+      Path: /
+      Policies:
+        - PolicyName: hw2-1323-code-pipeline-policy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/codebuild/*"
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group:/aws/codebuild/*:log-stream:*"
+              - Effect: Allow
+                Action:
+                  - "codebuild:BatchGetBuilds"
+                  - "codebuild:StartBuild"
+                Resource:
+                  - !Sub "arn:aws:codebuild:*:${AWS::AccountId}:project/hw2-1323-code-build-deploy2stage" #CodeBuild project we've created earlier
+                  - !Sub "arn:aws:codebuild:*:${AWS::AccountId}:project/hw2-1323-code-build-deploy2prod" #CodeBuild project we've created earlier
+              - Effect: Allow
+                Action:
+                  - "iam:GetRole"
+                  - "iam:GetRolePolicy"
+                Resource: !Sub "arn:aws:iam::${AWS::AccountId}*"
+              - Effect: Allow
+                Action:
+                  - "cloudformation:CreateStack"
+                  - "cloudformation:UpdateStack"
+                  - "cloudformation:DeleteStack"
+                  - "cloudformation:Describe*"
+                  - "cloudformation:List*"
+                  - "cloudformation:Get*"
+                  - "cloudformation:PreviewStackUpdate"
+                  - "cloudformation:ValidateTemplate"
+                Resource: !Sub "arn:aws:cloudformation:*:${AWS::AccountId}:stack/*"
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:DeleteLogGroup"
+                  - "logs:DeleteLogStream"
+                  - "logs:DescribeLog*"
+                  - "logs:FilterLogEvents"
+                Resource:
+                  - !Sub "arn:aws:logs:*:${AWS::AccountId}:log-group::log-stream*"
+
+
+Outputs:
+  HW2RepoBucketARN:
+    Description: 'Output the ARN for the new hw2-1323-repo bucket'
+    Value: !GetAtt HW2RepoBucket.Arn
