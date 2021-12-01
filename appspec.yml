@@ -8,5 +8,5 @@ resources:
       currentversion: "1"
       targetversion: "2"
 hooks:
-  - BeforeAllowTraffic: "hw3_validate_before_lambda"
-  - AfterAllowTraffic: "hw3_validate_after_lambda"
+  - BeforeAllowTraffic: "hw3_validate_before"
+  - AfterAllowTraffic: "hw3_validate_after"
