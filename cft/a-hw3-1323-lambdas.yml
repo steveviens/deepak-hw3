@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Creates lambda function used for Homework #3"
 Resources:
 
-  HW3RepoBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: 'hw3-1323-repo'
-
   HW3EmailBucket:
     # Source: https://www.itonaut.com/2018/10/03/implement-s3-bucket-lambda-triggers-in-aws-cloudformation/
     Type: AWS::S3::Bucket
@@ -64,10 +58,15 @@ Resources:
       FunctionName: hw3-lambda-function
       Runtime: python3.8
       Role: !GetAtt HW3LambdaFunctionExecutionRole.Arn
-      Handler: lambda_function.lambda_handler
+      Handler: hw3_lambda.lambda_handler
       Code:
-        S3Bucket: hw3-1323-repo
-        S3Key: hw3_1323_lambda_build/hw3_1323_lambda.zip
+        ZipFile: |
+          import json
+          def lambda_handler(event, context):
+              return {
+                  'statusCode': 200,
+                  'body': json.dumps('Hello from hw3_lambda.py!')
+              }
       MemorySize: 256
       Timeout: 10
 
