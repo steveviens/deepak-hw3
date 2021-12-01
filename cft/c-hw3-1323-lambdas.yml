@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates lambda function used for Homework #3"
+Resources:
+
+  HW3RepoBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: 'hw3-1323-repo'
+
+  HW3EmailBucket:
+    # Source: https://www.itonaut.com/2018/10/03/implement-s3-bucket-lambda-triggers-in-aws-cloudformation/
+    Type: AWS::S3::Bucket
+    DependsOn: HW3TriggerLambdaFunctionPermission
+    Properties:
+      BucketName: 'hw3-1323-email'
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt HW3LambdaFunction.Arn
+            Filter:
+              S3Key:
+                Rules:
+                - Name: suffix
+                  Value: .jpeg
+
+  HW3TriggerLambdaFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !GetAtt HW3LambdaFunction.Arn
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub 'arn:aws:s3:::hw3-1323-email'
+      SourceAccount: !Ref AWS::AccountId
+
+  HW3LambdaFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: hw3-1323-lambda-function-execution-role
+      Description: Describe this IAM role here
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+          Action:
+            - sts:AssumeRole
+      Path: '/'
+      Policies:
+      - PolicyName: hw3-1323-admin-access-policy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action: "*"
+            Resource: "*"
+
+  HW3LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Amazon SES stores emails received in this bucket
+      FunctionName: hw3-lambda-function
+      Runtime: python3.8
+      Role: !GetAtt HW3LambdaFunctionExecutionRole.Arn
+      Handler: lambda_function.lambda_handler
+      Code:
+        S3Bucket: hw3-1323-repo
+        S3Key: hw3_1323_lambda_build/hw3_1323_lambda.zip
+      MemorySize: 256
+      Timeout: 10
+
+Outputs:
+  HW3EmailBucketARN:
+    Description: 'The ARN for the hw3-1323-email bucket'
+    Value: !GetAtt HW3EmailBucket.Arn
+  HW3LambdaFunctionExecutionRoleARN:
+    Description: 'The ARN for the hw3-lambda-function execution role'
+    Value: !GetAtt HW3LambdaFunctionExecutionRole.Arn
+

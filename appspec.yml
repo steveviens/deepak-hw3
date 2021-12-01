@@ -3,8 +3,8 @@ resources:
   - HW2LambdaFunction3:
     type: AWS::Lambda::Function
     properties:
-      name: "hw3_lambda1"
-      alias: "hw3_lambda1_alias"
+      name: "hw3_lambda"
+      alias: "hw3_lambda_alias"
       currentversion: "1"
       targetversion: "2"
 hooks:
