@@ -13,19 +13,14 @@ phases:
         commands:
             - echo Build started on `date`
             - zip -r -j hw3_1323_lambda.zip src/hw3_lambda.py src/util.py
-            #- zip -r -j hw3_1323_validate.zip src/hw3_validate_before_lambda.py src/hw3_validate_after_lambda.py src/util.py
     post_build:
         commands:
             - echo Build completed on `date`
             - echo "Updating lambda function code."
             - aws lambda update-function-code --function-name "hw3-lambda-function" --zip-file fileb://./hw3_1323_lambda.zip
-            #- aws lambda update-function-code --function-name "hw3-validate-before" --zip-file fileb://./hw3_1323_validate.zip
-            #- aws lambda update-function-code --function-name "hw3-validate-after" --zip-file fileb://./hw3_1323_validate.zip
-            #- aws lambda publish-version --function-name "hw3_lambda"
 artifacts:
     name: hw3_1323_lambda_build
     files:
-        - './appspec.yml'
+        - 'appspec.yml'
         - 'hw3_1323_lambda.zip'
-        #- 'hw3_1323_validate.zip'
     discard-paths: yes

@@ -18,6 +18,29 @@ Resources:
                 - Name: suffix
                   Value: .jpeg
 
+
+  HW3EmailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref HW3EmailBucket
+      PolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${HW3EmailBucket}/*
+            Principal:
+              Service: ses.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceAccount: '677126791323'
+                AWS:SourceArn: 'arn:aws:ses:us-east-1:677126791323:receipt-rule-set/hw3-rule-set:receipt-rule/hw3-receipt-rule'
+                #AWS:SourceAccount: ${AWS::AccountId}
+                #AWS:SourceArn: arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/hw3-rule-set:receipt-rule/hw3-receipt-rule
+
+
   HW3TriggerLambdaFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -26,6 +49,7 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !Sub 'arn:aws:s3:::hw3-1323-email'
       SourceAccount: !Ref AWS::AccountId
+
 
   HW3LambdaFunctionExecutionRole:
     Type: AWS::IAM::Role

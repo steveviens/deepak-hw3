@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates SES environment for homework #3"
+Resources:
+
+
+
+# Give Amazon SES permission to write to an S3 bucket
+# https://docs.aws.amazon.com/ses/latest/dg/receiving-email-permissions.html
+# ---
+# Replace RULE_SET_NAME with the name of the rule set that contains the receipt rule that contains the deliver to Amazon S3 bucket action.
+# Replace RECEIPT_RULE_NAME with the name of the receipt rule that contains the deliver to Amazon S3 bucket action.
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Sid":"AllowSESPuts",
+      "Effect":"Allow",
+      "Principal":{
+        "Service":"ses.amazonaws.com"
+      },
+      "Action":"s3:PutObject",
+      "Resource":"arn:aws:s3:::hw3-1323-email/*",
+      "Condition":{
+        "StringEquals":{
+          "AWS:SourceAccount":"677126791323",
+          "AWS:SourceArn": "arn:aws:ses:us-east-1:677126791323:receipt-rule-set/RULE_SET_NAME:receipt-rule/hw3-receipt-rule"
+        }
+      }
+    }
+  ]
+}
+
+# Give Amazon SES permission to invoke a AWS Lambda function
+# https://docs.aws.amazon.com/ses/latest/dg/receiving-email-permissions.html
+# ---
+# Replace RULE_SET_NAME with the name of the rule set that contains the receipt rule that contains the deliver to Amazon S3 bucket action.
+# Replace RECEIPT_RULE_NAME with the name of the receipt rule that contains the deliver to Amazon S3 bucket action.
+{
+  "Action": "lambda:InvokeFunction",
+  "Principal": "ses.amazonaws.com",
+  "SourceAccount": "677126791323",
+  "SourceArn": "arn:aws:ses:us-east-1:677126791323:receipt-rule-set/RULE_SET_NAME:receipt-rule/RECEIPT_RULE_NAME"
+  "StatementId": "GiveSESPermissionToInvokeFunction"
+}
+
