@@ -12,15 +12,15 @@ phases:
     build:
         commands:
             - echo Build started on `date`
-            - zip -r -j hw3_1323_lambda.zip src/hw3_lambda.py src/util.py
+            - zip -r -j hw3_lambda.zip src/hw3_lambda.py
     post_build:
         commands:
             - echo Build completed on `date`
             - echo "Updating lambda function code."
-            - aws lambda update-function-code --function-name "hw3-lambda-function" --zip-file fileb://./hw3_1323_lambda.zip
-artifacts:
-    name: hw3_1323_lambda_build
-    files:
-        - 'appspec.yml'
-        - 'hw3_1323_lambda.zip'
-    discard-paths: yes
+            - aws lambda update-function-code --function-name "hw3-lambda-function" --zip-file fileb://./hw3_lambda.zip
+#artifacts:
+#    name: hw3_lambda_build
+#    files:
+#        - 'appspec.yml'
+#        - 'hw3_lambda.zip'
+#    discard-paths: yes
