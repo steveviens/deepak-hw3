@@ -1,9 +1,14 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Creates lambda function used for Homework #3"
-Resources:
 
+Parameters :
+  HW3PredictionEndpointParameter:
+    Type: String
+    Description: HW3 Prediction Endpoint
+    Default: ""
+
+Resources:
   HW3EmailBucket:
-    # Source: https://www.itonaut.com/2018/10/03/implement-s3-bucket-lambda-triggers-in-aws-cloudformation/
     Type: AWS::S3::Bucket
     DependsOn: HW3TriggerLambdaFunctionPermission
     Properties:
@@ -12,7 +17,6 @@ Resources:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
             Function: !GetAtt HW3LambdaFunction.Arn
-
 
   HW3EmailBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -33,7 +37,6 @@ Resources:
                 AWS:SourceAccount: !Ref 'AWS::AccountId'
                 AWS:SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/hw3-ses-receipt-rule-set:receipt-rule/hw3-ses-receipt-rule'
 
-
   HW3TriggerLambdaFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
@@ -42,7 +45,6 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !Sub 'arn:aws:s3:::hw3-1323-email'
       SourceAccount: !Ref AWS::AccountId
-
 
   HW3LambdaFunctionExecutionRole:
     Type: AWS::IAM::Role
@@ -87,12 +89,10 @@ Resources:
       MemorySize: 256
       Timeout: 10
 
-
   HW3SesReceiptRuleSet:
     Type: AWS::SES::ReceiptRuleSet
     Properties:
       RuleSetName: hw3-ses-receipt-rule-set
-
 
   HW3SesReceiptRule:
     Type: AWS::SES::ReceiptRule
@@ -107,7 +107,6 @@ Resources:
               BucketName: !Ref HW3EmailBucket
         Enabled: true
         ScanEnabled: true
-
 
 Outputs:
   HW3EmailBucketARN:
