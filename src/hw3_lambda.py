@@ -1,3 +1,7 @@
+#
+#  Copyright 2019-2020 Viens Consulting, LLC. All Rights Reserved.
+#
+
 import boto3
 import json
 import logging
@@ -20,11 +24,11 @@ REPLY_TEMPLATE = {
 }
 
 
-# noinspection PyUnusedLocal
 def lambda_handler(event, context):
 
     # Print formatted JSON event object to log
-    logger.info(json.dumps(event, indent=2, sort_keys=False))
+    logger.info('event={}'.format(json.dumps(event, indent=2, sort_keys=False)))
+    logger.info('context={}'.format(json.dumps(context, indent=2, sort_keys=False)))
 
     # These values are used in email reply string substitution below
     # TODO: These should be assigned from SageMaker results
@@ -35,7 +39,7 @@ def lambda_handler(event, context):
     msg_class = 'MSG-CLASS'
     msg_score = 'MSG-SCORE'
 
-    # String substitution for message variables
+    # Reply email message string substitution
     reply = REPLY_TEMPLATE
 
     subject = reply.get('subject')
@@ -59,13 +63,26 @@ def lambda_handler(event, context):
     reply['text_body'] = textBody
 
     # Send report via email (SES)
-    reply_to_sender(reply)
-    logger.info('Email reply sent via SES')
+    try:
 
-    return {
-        'statusCode': 200,
-        'body': json.dumps('Hello from hw3_lambda.py!')
-    }
+        logger.info('Reply email to send via SES: {}'.format(json.dumps(reply, indent=2, sort_keys=False)))
+        reply_to_sender(reply)
+
+    except ClientError as e:
+
+        logger.error((e.response['Error']['Message']))
+        return {
+            'statusCode': 400,
+            'body': json.dumps(e.response['Error']['Message'])
+        }
+
+    else:
+
+        logger.info('Reply email sent!')
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Reply email sent!')
+        }
 
 
 def reply_to_sender(email_msg):
@@ -106,18 +123,12 @@ def reply_to_sender(email_msg):
     # parent container.
     msg.attach(msg_body)
 
-    try:
-        # Create an SES client and specify the AWS region that SES is configured
-        client = boto3.client('ses')
+    # Create an SES client & send email message
+    client = boto3.client('ses')
+    response = client.send_raw_email(
+        RawMessage={
+            'Data': msg.as_string(),
+        }
+    )
 
-        # Provide the contents of the email.
-        response = client.send_raw_email(
-            RawMessage={
-                'Data': msg.as_string(),
-            }
-        )
-    except ClientError as e:
-        # Display an error if something goes wrong.
-        print(e.response['Error']['Message'])
-    else:
-        print('Email sent! Message ID: {}'.format(response['MessageId'])),
+    return response
