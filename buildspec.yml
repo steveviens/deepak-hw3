@@ -18,9 +18,3 @@ phases:
             - echo Build completed on `date`
             - echo "Updating lambda function code."
             - aws lambda update-function-code --function-name "hw3-lambda-function" --zip-file fileb://./hw3_lambda.zip
-#artifacts:
-#    name: hw3_lambda_build
-#    files:
-#        - 'appspec.yml'
-#        - 'hw3_lambda.zip'
-#    discard-paths: yes

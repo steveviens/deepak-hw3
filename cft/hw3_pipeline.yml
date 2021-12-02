@@ -2,14 +2,6 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: 'Creates Homework #3 CodeBuild Project'
 Resources:
 
-
-  HW3RepoBucket:
-    Type: AWS::S3::Bucket
-    DeletionPolicy: Delete
-    Properties:
-      BucketName: 'hw3-1323-repo'
-
-
   HW3CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -17,11 +9,7 @@ Resources:
       Description: Build and deploy HW3 lambda function
       ServiceRole: !GetAtt HW3CodeBuildServiceRole.Arn
       Artifacts:
-        Type: S3
-        Path: hw3_1323_lambda_build
-        EncryptionDisabled: true
-        Location: !Ref HW3RepoBucket
-        Packaging: NONE
+        Type: NO_ARTIFACTS
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
@@ -37,7 +25,6 @@ Resources:
         - - Type: EVENT
             Pattern: PUSH
       TimeoutInMinutes: 10
-
 
   HW3CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'
@@ -130,8 +117,3 @@ Resources:
                   - 'logs:FilterLogEvents'
                 Resource:
                   - !Sub 'arn:aws:logs:*:${AWS::AccountId}:log-group::log-stream*'
-
-Outputs:
-  HW3RepoBucketARN:
-    Description: 'Output the ARN for the new hw3-1323-repo bucket'
-    Value: !GetAtt HW3RepoBucket.Arn
