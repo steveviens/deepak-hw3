@@ -30,10 +30,8 @@ Resources:
               Service: ses.amazonaws.com
             Condition:
               StringEquals:
-                AWS:SourceAccount: '677126791323'
-                AWS:SourceArn: 'arn:aws:ses:us-east-1:677126791323:receipt-rule-set/hw3-rule-set:receipt-rule/hw3-receipt-rule'
-                #AWS:SourceAccount: ${AWS::AccountId}
-                #AWS:SourceArn: arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/hw3-rule-set:receipt-rule/hw3-receipt-rule
+                AWS:SourceAccount: !Ref 'AWS::AccountId'
+                AWS:SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/hw3-ses-receipt-rule-set:receipt-rule/hw3-ses-receipt-rule'
 
 
   HW3TriggerLambdaFunctionPermission:
@@ -88,6 +86,28 @@ Resources:
               }
       MemorySize: 256
       Timeout: 10
+
+
+  HW3SesReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: hw3-ses-receipt-rule-set
+
+
+  HW3SesReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    Properties:
+      RuleSetName: !Ref HW3SesReceiptRuleSet
+      Rule:
+        Name: hw3-ses-receipt-rule
+        Recipients:
+          - hw3@viegco.com
+        Actions:
+          - S3Action:
+              BucketName: !Ref HW3EmailBucket
+        Enabled: true
+        ScanEnabled: true
+
 
 Outputs:
   HW3EmailBucketARN:
