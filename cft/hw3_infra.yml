@@ -13,6 +13,8 @@ Resources:
     DependsOn: HW3TriggerLambdaFunctionPermission
     Properties:
       BucketName: 'hw3-1323-email'
+      VersioningConfiguration:
+        Status: Enabled
       NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
