@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Creates lambda function used for Homework #3"
+Description: "Creates AWS Resources for Homework #3"
 
 Parameters :
   HW3PredictionEndpointParameter:
