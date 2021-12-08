@@ -4,7 +4,7 @@ phases:
         runtime-versions:
             python: 3.8
         commands:
-            - echo "Capturing the AWS CLI and Python versions used in this build."
+            - echo "Capturing the AWS CLI and Python versions used in the build."
             - aws --version
             - python --version
     pre_build:
