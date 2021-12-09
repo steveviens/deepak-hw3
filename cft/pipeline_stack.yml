@@ -17,6 +17,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: https://github.com/steveviens/deepak-hw3.git
+        BuildSpec: 'buildspec/lambda_buildspec.yml'
       Triggers:
         BuildType: BUILD
         Webhook: True
