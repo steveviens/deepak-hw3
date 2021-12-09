@@ -18,7 +18,7 @@ event = {
 timezone = pytz.timezone('US/Eastern')
 timestamp = datetime.now(timezone)
 started = datetime.now(timezone)
-response = hw3_lambda.lambda_handler(event, context={})
+response = predict_spam_function.lambda_handler(event, context={})
 status = response.get('statusCode')
 ended = datetime.now(timezone)
 print("--------------------------")
