@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Creates AWS Resources for Homework #3"
+Description: "Creates AWS Resource Stack for Homework #3"
 
 Parameters :
 
@@ -78,7 +78,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: Amazon SES stores emails received in this bucket
-      FunctionName: predict_spam_function
+      FunctionName: hw3-predict-spam-function
       Runtime: python3.8
       Role: !GetAtt LambdaFunctionExecutionRole.Arn
       Handler: predict_spam_function.lambda_handler
