@@ -2,12 +2,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: 'Creates Homework #3 CodeBuild Project'
 Resources:
 
-  HW3CodeBuildProject:
+  CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
       Name: hw3-lambda-build
       Description: Build and deploy HW3 lambda function
-      ServiceRole: !GetAtt HW3CodeBuildServiceRole.Arn
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
       Artifacts:
         Type: NO_ARTIFACTS
       Environment:
@@ -16,7 +16,6 @@ Resources:
         Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
       Source:
         Type: GITHUB
-        #Auth: OAUTH
         Location: https://github.com/steveviens/deepak-assignment3.git
       Triggers:
         BuildType: BUILD
@@ -26,7 +25,7 @@ Resources:
             Pattern: PUSH
       TimeoutInMinutes: 10
 
-  HW3CodeBuildServiceRole:
+  CodeBuildServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
       RoleName: hw3-1323-code-pipeline-service-role

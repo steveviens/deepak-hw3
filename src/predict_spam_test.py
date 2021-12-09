@@ -3,7 +3,7 @@
 #
 
 from datetime import datetime
-import hw3_lambda
+import predict_spam_function
 import logging
 import pytz
 import sys
