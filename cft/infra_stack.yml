@@ -78,7 +78,7 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Description: Amazon SES stores emails received in this bucket
-      FunctionName: hw3-lambda-function
+      FunctionName: predict_spam_function
       Runtime: python3.8
       Role: !GetAtt LambdaFunctionExecutionRole.Arn
       Handler: predict_spam_function.lambda_handler
