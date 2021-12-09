@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
+vdoc/
 .idea/
 .DS_Store
-vdoc/
+
 
 # C extensions
 *.so
