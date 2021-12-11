@@ -12,15 +12,15 @@ Resources:
 
   EmailBucket:
     Type: AWS::S3::Bucket
-    DependsOn: TriggerLambdaFunctionPermission
+    DependsOn: LambdaFunctionTriggerPermission
     Properties:
-      BucketName: 'hw3-1323-email'
-      VersioningConfiguration:
+      BucketName: 'hw3-1323-email'                          # Change the 1323 to something unique
+      VersioningConfiguration:                              # Bucket versioning is required
         Status: Enabled
-      NotificationConfiguration:
+      NotificationConfiguration:                            # This is the Lambda Trigger
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
-            Function: !GetAtt PredictSpamLambda.Arn
+            Function: !GetAtt PredictSpamLambda.Arn         # This is the Lambda Funtion
 
   EmailBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -41,7 +41,7 @@ Resources:
                 AWS:SourceAccount: !Ref 'AWS::AccountId'
                 AWS:SourceArn: !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/hw3-ses-receipt-rule-set:receipt-rule/hw3-ses-receipt-rule'
 
-  TriggerLambdaFunctionPermission:
+  LambdaFunctionTriggerPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: 'lambda:InvokeFunction'
@@ -84,12 +84,19 @@ Resources:
       Handler: predict_spam_function.lambda_handler
       Code:
         ZipFile: |
-          import json
-          def lambda_handler(event, context):
-              return {
-                  'statusCode': 200,
-                  'body': json.dumps('Hello from predict_spam_function.py!')
-              }
+          """
+          The Code argument is required and this ZipFile option generates a
+          Python source file called index.py in the Lambda function.  This
+          file will be replaced when you push changes to your GitHub repo
+          and the Code Pipeline resource runs, builds your lambda function
+          and deployes it to AWS Lambda
+          """
+          #import json
+          #def lambda_handler(event, context):
+          #    return {
+          #        'statusCode': 200,
+          #        'body': json.dumps('Hello from predict_spam_function.py!')
+          #    }
       MemorySize: 256
       Timeout: 10
 
