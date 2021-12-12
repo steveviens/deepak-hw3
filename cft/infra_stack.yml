@@ -86,17 +86,11 @@ Resources:
         ZipFile: |
           """
           The Code argument is required and this ZipFile option generates a
-          Python source file called index.py in the Lambda function.  This
-          file will be replaced when you push changes to your GitHub repo
-          and the Code Pipeline resource runs, builds your lambda function
-          and deployes it to AWS Lambda
+          Python source file called index.py in the Lambda function.
+          This file is replaced with your lambda code when you push changes to
+          your GitHub repo and the Code Pipeline resource runs, builds your
+          lambda function and deployes it to AWS Lambda
           """
-          #import json
-          #def lambda_handler(event, context):
-          #    return {
-          #        'statusCode': 200,
-          #        'body': json.dumps('Hello from predict_spam_function.py!')
-          #    }
       MemorySize: 256
       Timeout: 10
 
