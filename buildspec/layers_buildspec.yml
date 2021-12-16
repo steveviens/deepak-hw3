@@ -5,25 +5,28 @@ phases:
             python: 3.8
         commands:
             - echo Build starting on `date`
-              echo "Capturing the AWS CLI and Python versions used in the build."
+              echo Capturing the AWS CLI and Python versions used in the build
             - aws --version
             - python --version
     pre_build:
         commands:
-            - echo "Create a Python virtual environment (venv)"
+            - echo Create a Python virtual environment (venv)
             - python3 -m venv ./venv
-            - echo "Start the Python virtual environment (mac/linux)"
+            - echo Start the Python virtual environment (mac/linux)
             - source ./venv/bin/activate
-            - echo "Updating pip"
+            - echo Updating pip
             - pip install --upgrade pip
     build:
         commands:
-            - echo Building download python module
+            - echo Downloading python modules
             - pip install -t numpy/python numpy
+            - pip install -t requests/python requests
     post_build:
         commands:
-            - echo "Updating lambda function code."
-            - zip -r -j hw3-numpy-layer.zip python
+            - echo Packaging python modules into zip files
+            - (cd numpy; zip -r ../hw3-numpy-layer.zip python)
+            #- zip -r hw3-numpy-layer.zip numpy/python
+            #- zip -r hw3-requests-layer.zip requests/python
             - echo Build completed on `date`
 artifacts:
     files:
