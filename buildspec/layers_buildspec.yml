@@ -1,0 +1,31 @@
+version: 0.2
+phases:
+    install:
+        runtime-versions:
+            python: 3.8
+        commands:
+            - echo Build starting on `date`
+              echo "Capturing the AWS CLI and Python versions used in the build."
+            - aws --version
+            - python --version
+    pre_build:
+        commands:
+            - echo "Create a Python virtual environment (venv)"
+            - python3 -m venv ./venv
+            - echo "Start the Python virtual environment (mac/linux)"
+            - source ./venv/bin/activate
+            - echo "Updating pip"
+            - pip install --upgrade pip
+    build:
+        commands:
+            - echo Building download python module
+            #- pip install -t numpy/python
+    post_build:
+        commands:
+            - echo "Updating lambda function code."
+            #- zip -r -j numpy-layer.zip python
+            - echo Build completed on `date`
+
+# REFERENCE:
+#   - Build specification reference for CodeBuild
+#     https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html

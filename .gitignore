@@ -5,7 +5,7 @@ __pycache__/
 vdoc/
 .idea/
 .DS_Store
-
+sandbox/
 
 # C extensions
 *.so
