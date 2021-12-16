@@ -114,10 +114,11 @@ Resources:
         ScanEnabled: true
 
 Outputs:
+
   EmailBucketARN:
     Description: 'The ARN for the hw3-1323-email bucket'
     Value: !GetAtt EmailBucket.Arn
+
   LambdaFunctionExecutionRoleARN:
     Description: 'The ARN for the hw3-lambda-function execution role'
     Value: !GetAtt LambdaFunctionExecutionRole.Arn
-
