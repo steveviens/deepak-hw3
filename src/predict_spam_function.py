@@ -6,6 +6,7 @@ import os
 import boto3
 import json
 import logging
+import sms_spam_classifier_utilities
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText

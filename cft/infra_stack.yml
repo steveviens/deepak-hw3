@@ -1,12 +1,12 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Creates AWS Resource Stack for Homework #3"
 
-Parameters :
+Parameters:
 
   PredictionEndpointParameter:
     Type: String
-    Description: HW3 Prediction Endpoint                    # TODO: See page 4 of the doc/HW3.pdf - search for (E1)
-    Default: ""
+    Description: HW3 Prediction Endpoint                    # TODO: See page 4 of the doc/HW3.pdf (search for "E1")
+    Default: "https://replace_with_prediction_endpoint"
 
 Resources:
 
@@ -14,7 +14,7 @@ Resources:
     Type: AWS::S3::Bucket
     DependsOn: LambdaFunctionTriggerPermission
     Properties:
-      BucketName: 'hw3-1323-email'                          # TODO: Change the 1323 to something unique (e.g. 'dd2676')
+      BucketName: 'hw3-1323-email'                          # TODO: Change the 1323 to something unique (e.g. "dd2676")
       VersioningConfiguration:                              # TODO: Bucket versioning is required
         Status: Enabled
       NotificationConfiguration:                            # TODO: This is the Lambda Trigger
@@ -55,9 +55,6 @@ Resources:
     Properties:
       RoleName: hw3-lambda-function-execution-role
       Description: Describe this IAM role here
-      Environment:
-        Variables:
-          ENDPOINT_NAME: !Ref: PredictionEndpointParameter
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -94,6 +91,10 @@ Resources:
           your GitHub repo and the Code Pipeline resource runs, builds your
           lambda function and deployes it to AWS Lambda
           """
+      Environment:
+        Variables:
+          ENDPOINT_NAME:
+            Ref: PredictionEndpointParameter
       MemorySize: 256
       Timeout: 10
 

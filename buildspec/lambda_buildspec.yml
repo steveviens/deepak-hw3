@@ -14,7 +14,7 @@ phases:
     build:
         commands:
             - echo Building hw3 lambda - started on `date`
-            - zip -r -j predict_spam_function.zip src/predict_spam_function.py
+            - zip -r -j predict_spam_function.zip src/predict_spam_function.py src/sms_spam_classifier_utilities.py
     post_build:
         commands:
             - echo Build completed on `date`
