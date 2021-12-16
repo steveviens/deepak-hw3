@@ -1,6 +1,7 @@
 #
 #  Copyright 2019-2020 Viens Consulting, LLC. All Rights Reserved.
 #
+import os
 
 import boto3
 import json
@@ -29,8 +30,15 @@ def lambda_handler(event, context):
     # Print formatted JSON event object to log
     logger.info('event={}'.format(json.dumps(event, indent=2, sort_keys=False)))
 
+    # Get the Prediction Engine endpoint environment variable
+    ENDPOINT_NAME = os.environ['ENDPOINT_NAME']
+    logger.info('Prediction Engine Endpoint={}'.format(ENDPOINT_NAME))
+
+    # ################################## #
+    # TODO: DO YOUR SAGEMAKER WORK HERE! #
+    # ################################## #
+
     # These values are used in email reply string substitution below
-    # TODO: These should be assigned from SageMaker results
     orig_sender = 'Steve Viens<steve@viens.net>'
     receive_date = 'ORIG-DATE'
     orig_subject = 'ORIG-SUBJECT'

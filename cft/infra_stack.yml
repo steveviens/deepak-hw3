@@ -55,6 +55,9 @@ Resources:
     Properties:
       RoleName: hw3-lambda-function-execution-role
       Description: Describe this IAM role here
+      Environment:
+        Variables:
+          ENDPOINT_NAME: !Ref: PredictionEndpointParameter
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
