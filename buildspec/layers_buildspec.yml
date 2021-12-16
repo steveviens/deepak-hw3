@@ -10,7 +10,7 @@ phases:
             - python --version
     pre_build:
         commands:
-            - echo Create a Python virtual environment (venv)
+            - echo Create a Python virtual environment
             - python3 -m venv ./venv
             - echo Start the Python virtual environment (mac/linux)
             - source ./venv/bin/activate
