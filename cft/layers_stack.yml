@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: 'Creates CodeBuild Resource Stack for Homework #3'
 Resources:
 
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: 'hw3-1323-artifacts'
+
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -9,7 +14,9 @@ Resources:
       Description: Build and publish HW3 lambda layers
       ServiceRole: arn:aws:iam::677126791323:role/hw3-code-pipeline-service-role
       Artifacts:
-        Type: NO_ARTIFACTS
+        Type: S3
+        Name: '/'
+        Location: !Ref ArtifactsBucket
       Environment:
         Type: LINUX_CONTAINER
         ComputeType: BUILD_GENERAL1_SMALL
@@ -25,3 +32,5 @@ Resources:
         - - Type: EVENT
             Pattern: PUSH
       TimeoutInMinutes: 10
+
+

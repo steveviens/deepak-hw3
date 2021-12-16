@@ -19,12 +19,15 @@ phases:
     build:
         commands:
             - echo Building download python module
-            #- pip install -t numpy/python
+            - pip install -t numpy/python
     post_build:
         commands:
             - echo "Updating lambda function code."
-            #- zip -r -j numpy-layer.zip python
+            - zip -r -j hw3-numpy-layer.zip python
             - echo Build completed on `date`
+artifacts:
+    files:
+        - hw3-numpy-layer.zip
 
 # REFERENCE:
 #   - Build specification reference for CodeBuild
