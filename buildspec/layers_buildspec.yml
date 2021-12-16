@@ -12,7 +12,7 @@ phases:
         commands:
             - echo Create a Python virtual environment
             - python3 -m venv ./venv
-            - echo Start the Python virtual environment (mac/linux)
+            - echo Start the Python virtual environment
             - source ./venv/bin/activate
             - echo Updating pip
             - pip install --upgrade pip
