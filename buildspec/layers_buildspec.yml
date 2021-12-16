@@ -25,6 +25,7 @@ phases:
         commands:
             - echo Packaging python modules into zip files
             - (cd numpy; zip -r ../hw3-numpy-layer.zip python)
+            - (cd requests; zip -r ../hw3-requests-layer.zip python)
             #- zip -r hw3-numpy-layer.zip numpy/python
             #- zip -r hw3-requests-layer.zip requests/python
             - echo Build completed on `date`
