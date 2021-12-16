@@ -28,7 +28,6 @@ def lambda_handler(event, context):
 
     # Print formatted JSON event object to log
     logger.info('event={}'.format(json.dumps(event, indent=2, sort_keys=False)))
-    logger.info('context={}'.format(json.dumps(context, indent=2, sort_keys=False)))
 
     # These values are used in email reply string substitution below
     # TODO: These should be assigned from SageMaker results
