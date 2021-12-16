@@ -6,7 +6,7 @@ Parameters:
   PredictionEndpointParameter:
     Type: String
     Description: HW3 Prediction Endpoint                    # TODO: See page 4 of the doc/HW3.pdf (search for "E1")
-    Default: "https://replace_with_prediction_endpoint"
+    Default: "replace_with_prediction_endpoint"
 
 Resources:
 
@@ -95,6 +95,8 @@ Resources:
         Variables:
           ENDPOINT_NAME:
             Ref: PredictionEndpointParameter
+      Layers:
+        - arn:aws:lambda:us-east-1:668099181075:layer:AWSLambda-Python38-SciPy1x:107
       MemorySize: 256
       Timeout: 10
 
