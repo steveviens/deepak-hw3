@@ -16,7 +16,7 @@ Resources:
         Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
       Source:
         Type: GITHUB
-        Location: https://github.com/steveviens/deepak-hw3.git
+        Location: https://github.com/steveviens/deepak-hw3.git      # TODO: Replace this with your GitHub repo
         BuildSpec: 'buildspec/lambda_buildspec.yml'
       Triggers:
         BuildType: BUILD

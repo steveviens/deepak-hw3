@@ -5,7 +5,7 @@ Parameters :
 
   PredictionEndpointParameter:
     Type: String
-    Description: HW3 Prediction Endpoint
+    Description: HW3 Prediction Endpoint                    # TODO: See page 4 of the doc/HW3.pdf - search for (E1)
     Default: ""
 
 Resources:
@@ -14,13 +14,13 @@ Resources:
     Type: AWS::S3::Bucket
     DependsOn: LambdaFunctionTriggerPermission
     Properties:
-      BucketName: 'hw3-1323-email'                          # Change the 1323 to something unique
-      VersioningConfiguration:                              # Bucket versioning is required
+      BucketName: 'hw3-1323-email'                          # TODO: Change the 1323 to something unique (e.g. 'dd2676')
+      VersioningConfiguration:                              # TODO: Bucket versioning is required
         Status: Enabled
-      NotificationConfiguration:                            # This is the Lambda Trigger
+      NotificationConfiguration:                            # TODO: This is the Lambda Trigger
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
-            Function: !GetAtt PredictSpamLambda.Arn         # This is the Lambda Funtion
+            Function: !GetAtt PredictSpamLambda.Arn         # TODO: This is the Lambda Funtion
 
   EmailBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -47,7 +47,7 @@ Resources:
       Action: 'lambda:InvokeFunction'
       FunctionName: !GetAtt PredictSpamLambda.Arn
       Principal: s3.amazonaws.com
-      SourceArn: !Sub 'arn:aws:s3:::hw3-1323-email'
+      SourceArn: !Sub 'arn:aws:s3:::hw3-1323-email'         # TODO: Change the 1323 to something unique (e.g. 'dd2676') - match line 17
       SourceAccount: !Ref AWS::AccountId
 
   LambdaFunctionExecutionRole:
@@ -106,7 +106,7 @@ Resources:
       Rule:
         Name: hw3-ses-receipt-rule
         Recipients:
-          - hw3@viegco.com
+          - hw3@viegco.com                                  # TODO: Change 'hw3@viegeco.com to email address you are filtering spam for
         Actions:
           - S3Action:
               BucketName: !Ref EmailBucket
@@ -118,7 +118,3 @@ Outputs:
   EmailBucketARN:
     Description: 'The ARN for the hw3-1323-email bucket'
     Value: !GetAtt EmailBucket.Arn
-
-  LambdaFunctionExecutionRoleARN:
-    Description: 'The ARN for the hw3-lambda-function execution role'
-    Value: !GetAtt LambdaFunctionExecutionRole.Arn
