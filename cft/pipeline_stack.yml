@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: 'Creates CodePipeline Resource Stack for Homework #3'
+Description: 'Creates CodePipeline Lambda Resources Stack for Homework #3'
 Resources:
 
-  CodeBuildProject:
+  LambdaCodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
       Name: hw3-lambda-build
