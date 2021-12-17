@@ -7,6 +7,20 @@ Resources:
     Properties:
       BucketName: 'hw3-1323-artifacts'
 
+  ArtifactsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactsBucket
+      PolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Action:
+              - s3:PutObject
+            Resource:
+              - !Sub arn:aws:s3:::${ArtifactsBucket}/*
+            Principal: '*'
+
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
     Properties:
