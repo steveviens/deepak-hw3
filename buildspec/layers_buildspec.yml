@@ -30,6 +30,7 @@ phases:
 artifacts:
     files:
         - hw3-numpy-layer.zip
+        - hw3-requests-layer.zip
 
 # REFERENCE:
 #   - Build specification reference for CodeBuild
