@@ -6,6 +6,8 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: 'hw3-1323-artifacts'
+      VersioningConfiguration:
+        Status: Suspended
 
   ArtifactsBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -26,7 +28,7 @@ Resources:
     Properties:
       Name: hw3-layers-build
       Description: Build and publish HW3 lambda layers
-      ServiceRole: arn:aws:iam::677126791323:role/hw3-code-pipeline-service-role
+      ServiceRole: !Sub arn:aws:iam::${AWS::AccountId}:role/hw3-code-pipeline-service-role
       Artifacts:
         Type: S3
         Name: '/'
@@ -39,12 +41,12 @@ Resources:
         Type: GITHUB
         Location: https://github.com/steveviens/deepak-hw3.git      # TODO: Replace this with your GitHub repo
         BuildSpec: 'buildspec/layers_buildspec.yml'
-      Triggers:
-        BuildType: BUILD
-        Webhook: True
-        FilterGroups:
-        - - Type: EVENT
-            Pattern: PUSH
+      #Triggers:
+      #  BuildType: BUILD
+      #  Webhook: True
+      #  FilterGroups:
+      #  - - Type: EVENT
+      #      Pattern: PUSH
       TimeoutInMinutes: 10
 
 
