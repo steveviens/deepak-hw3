@@ -19,9 +19,15 @@ Resources:
             Effect: Allow
             Action:
               - s3:PutObject
+              - s3:GetObject
+              - s3:List*
             Resource:
               - !Sub arn:aws:s3:::${ArtifactsBucket}/*
-            Principal: '*'
+            Principal:
+              Service: codebuild.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceAccount: !Ref 'AWS::AccountId'
 
   CodeBuildProject:
     Type: 'AWS::CodeBuild::Project'
