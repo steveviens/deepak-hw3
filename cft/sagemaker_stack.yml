@@ -1,0 +1,88 @@
+# Reference: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-sagemaker-endpoint.html
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Basic Hosting entities test.  We need models to create endpoint configs."
+
+Mappings: 
+
+  RegionMap:
+    "us-west-2":
+      "NullTransformer": "123456789012.dkr.ecr.us-west-2.amazonaws.com/mymodel:latest"
+    "us-east-2":
+      "NullTransformer": "123456789012.dkr.ecr.us-east-2.amazonaws.com/mymodel:latest"
+    "us-east-1":
+      "NullTransformer": "123456789012.dkr.ecr.us-east-1.amazonaws.com/mymodel:latest"
+    "eu-west-1":
+      "NullTransformer": "123456789012.dkr.ecr.eu-west-1.amazonaws.com/mymodel:latest"
+    "ap-northeast-1":
+      "NullTransformer": "123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/mymodel:latest"
+    "ap-northeast-2":
+      "NullTransformer": "123456789012.dkr.ecr.ap-northeast-2.amazonaws.com/mymodel:latest"
+    "ap-southeast-2":
+      "NullTransformer": "123456789012.dkr.ecr.ap-southeast-2.amazonaws.com/mymodel:latest"
+    "eu-central-1":
+      "NullTransformer": "123456789012.dkr.ecr.eu-central-1.amazonaws.com/mymodel:latest"
+
+Resources:
+
+  SageMakerEndpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties:
+      EndpointConfigName:
+        !GetAtt SageMakerEndpointConfig.EndpointConfigName
+
+  SageMakerEndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"                  # Do I manually list the Endpoint Name 'sms-spam-classifier-ll-2021-12-14-07-17-07-278' here?
+    Properties:
+      EndpointConfigName: hw3-sagemaker-endpoint-config
+      ProductionVariants:
+        - InitialInstanceCount: 1
+          InitialVariantWeight: 1.0
+          InstanceType: ml.t2.large
+          ModelName: !GetAtt SageMakerModel.ModelName                # Not sure if I need a model
+          VariantName: !GetAtt SageMakerModel.ModelName
+
+  SageMakerModel:
+    Type: "AWS::SageMaker::Model"
+    Properties:
+      PrimaryContainer:
+        Image: !FindInMap [RegionMap, !Ref "AWS::Region", "NullTransformer"]
+      ExecutionRoleArn: !GetAtt SageMakerExecutionRole.Arn
+
+  SageMakerExecutionRole:
+    Type: "AWS::IAM::Role"
+    Properties: 
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+          - 
+            Effect: "Allow"
+            Principal: 
+              Service: 
+                - "sagemaker.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Path: "/"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/AmazonSageMakerFullAccess
+      #Policies:
+      #  -
+      #    PolicyName: "root"
+      #    PolicyDocument:
+      #      Version: "2012-10-17"
+      #      Statement:
+      #        -
+      #          Effect: "Allow"
+      #          Action: "*"
+      #          Resource: "*"
+
+Outputs:
+
+  EndpointId:
+    Value: !Ref SageMakerEndpoint
+
+  EndpointName:
+    Value: !GetAtt  SageMakerEndpoint.EndpointName
