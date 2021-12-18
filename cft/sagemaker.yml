@@ -1,6 +1,6 @@
 Description: "Basic Hosting entities test.  We need models to create endpoint configs."
-Mappings: 
-  RegionMap: 
+Mappings:
+  RegionMap:
     "us-east-1":
       "NullTransformer": "arn:aws:sagemaker:us-east-1:945261194256:model/sms-spam-classifier-ll-2021-12-14-07-17-07-278"
     # "eu-west-1":
