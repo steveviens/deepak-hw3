@@ -15,12 +15,12 @@ Resources:
     DependsOn: LambdaFunctionTriggerPermission
     Properties:
       BucketName: 'hw3-1323-email'                          # TODO: Change the 1323 to something unique (e.g. "dd2676")
-      VersioningConfiguration:                              # TODO: Bucket versioning is required
+      VersioningConfiguration:
         Status: Enabled
-      NotificationConfiguration:                            # TODO: This is the Lambda Trigger
+      NotificationConfiguration:
         LambdaConfigurations:
           - Event: s3:ObjectCreated:*
-            Function: !GetAtt PredictSpamLambda.Arn         # TODO: This is the Lambda Funtion
+            Function: !GetAtt PredictSpamLambda.Arn
 
   EmailBucketPolicy:
     Type: AWS::S3::BucketPolicy
