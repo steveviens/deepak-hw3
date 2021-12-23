@@ -47,8 +47,9 @@ def lambda_handler(event, context):
     msg_class = 'MSG-CLASS'
     msg_score = 'MSG-SCORE'
 
-    # Reply email message string substitution
-    reply = REPLY_TEMPLATE
+    # Reply email message string substitution (make copy or
+    # future invocations will reuse the replaced values).
+    reply = REPLY_TEMPLATE.copy()
 
     subject = reply.get('subject')
     subject = subject.replace('[EMAIL_RECEIVE_DATE]', receive_date)
